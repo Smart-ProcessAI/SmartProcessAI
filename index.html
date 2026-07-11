@@ -247,6 +247,11 @@
     .account-modal-label { color: #9ca3af; }
     .account-modal-row span:last-child { color: #1a1a2e; font-weight: 500; text-align: right; }
     .account-modal-note { font-size: 12px; color: #9ca3af; margin-top: 1rem; line-height: 1.5; }
+    .onboarding-step { display: flex; gap: 14px; align-items: flex-start; }
+    .ob-step-num { width: 28px; height: 28px; border-radius: 50%; background: #534AB7; color: #fff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .ob-step-num.done { background: #22c55e; }
+    .ob-step-title { font-size: 14px; font-weight: 500; color: #1a1a2e; margin-bottom: 3px; }
+    .ob-step-desc { font-size: 12px; color: #6b7280; line-height: 1.5; }
     .toggle-wrap { cursor: pointer; }
     .toggle-track { width: 40px; height: 22px; background: #d1d5db; border-radius: 999px; position: relative; transition: background 0.2s; }
     .toggle-track.on { background: #534AB7; }
@@ -501,7 +506,7 @@
           <li><i class="ti ti-check"></i> Onboarding dédié</li>
           <li><i class="ti ti-check"></i> Support 7j/7</li>
         </ul>
-        <button class="btn-outline" style="width:100%" onclick="document.getElementById('connexion').scrollIntoView({behavior:'smooth'})">Choisir Elite</button>
+        <button class="btn-outline" style="width:100%" onclick="openContactModal()">Nous contacter</button>
       </div>
     </div>
   </section>
@@ -568,6 +573,28 @@
 
 </div>
 
+<!-- Modal Contact -->
+<div id="contact-modal-overlay" class="account-modal-overlay" style="display:none;" onclick="if(event.target===this) closeContactModal()">
+  <div class="account-modal" style="max-width:480px;">
+    <div class="account-modal-header">
+      <h3>Nous contacter</h3>
+      <button class="account-modal-close" onclick="closeContactModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:1.25rem; line-height:1.6;">Une question sur nos offres ou votre situation ? Décrivez-nous votre besoin et nous vous répondons sous 24h.</p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <input type="text" id="contact-name" placeholder="Votre nom" style="width:100%; padding:10px 14px; border:0.5px solid rgba(0,0,0,0.15); border-radius:8px; font-size:13px; outline:none; font-family:inherit;">
+      <input type="email" id="contact-email" placeholder="Votre adresse email" style="width:100%; padding:10px 14px; border:0.5px solid rgba(0,0,0,0.15); border-radius:8px; font-size:13px; outline:none; font-family:inherit;">
+      <input type="text" id="contact-company" placeholder="Votre entreprise (optionnel)" style="width:100%; padding:10px 14px; border:0.5px solid rgba(0,0,0,0.15); border-radius:8px; font-size:13px; outline:none; font-family:inherit;">
+      <textarea id="contact-message" placeholder="Votre message..." rows="4" style="width:100%; padding:10px 14px; border:0.5px solid rgba(0,0,0,0.15); border-radius:8px; font-size:13px; outline:none; resize:vertical; font-family:inherit; line-height:1.6;"></textarea>
+    </div>
+    <p id="contact-message-status" style="font-size:12px; margin-top:8px; display:none;"></p>
+    <div style="display:flex; gap:10px; margin-top:1.25rem;">
+      <button class="btn-outline" style="flex:1;" onclick="closeContactModal()">Annuler</button>
+      <button class="btn-primary" style="flex:1;" onclick="submitContact()">Envoyer le message</button>
+    </div>
+  </div>
+</div>
+
 <!-- DASHBOARD -->
 <div id="dashboard">
   <div class="user-banner">
@@ -619,6 +646,36 @@
     <div class="label">Boîte mail Gmail</div>
     <p id="gmail-status" style="font-size:13px; color:#6b7280; margin:6px 0 12px;">Non connectée</p>
     <button class="btn-primary" style="width:100%;" onclick="connectGmail()">Connecter ma boîte mail Gmail</button>
+  </div>
+
+  <!-- Onboarding guidé -->
+  <div id="onboarding-banner" style="display:none; background:#EEEDFE; border:0.5px solid rgba(83,74,183,0.2); border-radius:12px; padding:1.5rem; margin-bottom:2rem;">
+    <h3 style="font-size:16px; font-weight:500; color:#1a1a2e; margin-bottom:0.5rem;">🚀 Bienvenue sur Neluxora AI</h3>
+    <p style="font-size:13px; color:#6b7280; margin-bottom:1.25rem;">Suivez ces 3 étapes pour commencer à automatiser vos emails.</p>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="onboarding-step" id="ob-step-1">
+        <div class="ob-step-num" id="ob-num-1">1</div>
+        <div>
+          <div class="ob-step-title">Connectez votre boîte Gmail</div>
+          <div class="ob-step-desc">Autorisez Neluxora AI à lire vos emails pour générer des résumés automatiquement.</div>
+          <button class="btn-primary" style="margin-top:8px; font-size:12px; padding:6px 14px;" onclick="connectGmail()"><i class="ti ti-mail"></i> Connecter Gmail</button>
+        </div>
+      </div>
+      <div class="onboarding-step" id="ob-step-2" style="opacity:0.5;">
+        <div class="ob-step-num" id="ob-num-2">2</div>
+        <div>
+          <div class="ob-step-title">Attendez le premier traitement</div>
+          <div class="ob-step-desc">Neluxora AI analysera automatiquement vos emails non lus toutes les 15 minutes.</div>
+        </div>
+      </div>
+      <div class="onboarding-step" id="ob-step-3" style="opacity:0.5;">
+        <div class="ob-step-num" id="ob-num-3">3</div>
+        <div>
+          <div class="ob-step-title">Consultez vos résumés</div>
+          <div class="ob-step-desc">Vos emails apparaîtront ici avec leur résumé et une réponse suggérée prête à envoyer.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="section-label" style="margin-top:2rem">Activité récente</div>
@@ -1083,24 +1140,54 @@
       if (!user) {
         cardEl.style.display = 'block';
         statusEl.textContent = "Connecte ta boîte Gmail pour activer les automatisations.";
+        removeGmailErrorBanner();
         return;
       }
-      supabaseClient.from('gmail_connections').select('user_id, email').eq('user_id', user.id).maybeSingle()
+      supabaseClient.from('gmail_connections').select('user_id, email, last_error').eq('user_id', user.id).maybeSingle()
         .then(({ data: row }) => {
           if (row) {
             cardEl.style.display = 'none';
             menuConnect.style.display = 'none';
             menuChange.style.display = 'flex';
             menuDisconnect.style.display = 'flex';
+
+            if (row.last_error === 'token_expired') {
+              showGmailErrorBanner();
+            } else {
+              removeGmailErrorBanner();
+            }
           } else {
             cardEl.style.display = 'block';
             statusEl.textContent = "Non connectée";
             menuConnect.style.display = 'flex';
             menuChange.style.display = 'none';
             menuDisconnect.style.display = 'none';
+            removeGmailErrorBanner();
           }
         });
     });
+  }
+
+  function showGmailErrorBanner() {
+    if (document.getElementById('gmail-error-banner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'gmail-error-banner';
+    banner.style.cssText = 'background:#fff1f1; border:0.5px solid #fca5a5; border-radius:10px; padding:14px 18px; margin-bottom:1.5rem; display:flex; align-items:center; gap:12px; font-size:13px; color:#e53e3e;';
+    banner.innerHTML = `
+      <i class="ti ti-alert-circle" style="font-size:20px; flex-shrink:0;"></i>
+      <div style="flex:1;">
+        <strong>Votre connexion Gmail a expiré</strong><br>
+        <span style="color:#6b7280;">Les automatisations sont suspendues. Reconnectez votre boîte Gmail pour les relancer.</span>
+      </div>
+      <button class="btn-primary" style="flex-shrink:0; font-size:12px;" onclick="connectGmail()">Reconnecter Gmail</button>
+    `;
+    const dashCards = document.querySelector('.dash-cards');
+    if (dashCards) dashCards.before(banner);
+  }
+
+  function removeGmailErrorBanner() {
+    const banner = document.getElementById('gmail-error-banner');
+    if (banner) banner.remove();
   }
 
   function escapeHtml(str) {
@@ -1448,6 +1535,36 @@
     document.getElementById('account-modal-overlay').style.display = 'none';
   }
 
+  function updateOnboarding(gmailConnected, emailCount) {
+    const banner = document.getElementById('onboarding-banner');
+    if (!banner) return;
+
+    // Masquer l'onboarding si l'utilisateur a déjà des emails traités
+    if (emailCount > 0) {
+      banner.style.display = 'none';
+      return;
+    }
+
+    banner.style.display = 'block';
+
+    const step1 = document.getElementById('ob-step-1');
+    const step2 = document.getElementById('ob-step-2');
+    const step3 = document.getElementById('ob-step-3');
+    const num1 = document.getElementById('ob-num-1');
+
+    if (gmailConnected) {
+      step1.style.opacity = '1';
+      num1.classList.add('done');
+      num1.innerHTML = '<i class="ti ti-check" style="font-size:12px;"></i>';
+      step1.querySelector('button')?.remove();
+      step2.style.opacity = '1';
+    } else {
+      step1.style.opacity = '1';
+      step2.style.opacity = '0.5';
+    }
+    step3.style.opacity = '0.5';
+  }
+
   function updateDashboardCounters(userId) {
     supabaseClient
       .from('email_automations')
@@ -1461,6 +1578,12 @@
         if (values[1]) values[1].textContent = rows.length;
         if (values[2]) values[2].textContent = rows.filter(r => r.suggested_reply).length;
         if (values[3]) values[3].textContent = Math.round(rows.length * 3 / 60 * 10) / 10 + 'h';
+
+        // Mettre à jour l'onboarding selon le nombre d'emails traités
+        supabaseClient.from('gmail_connections').select('user_id').eq('user_id', userId).maybeSingle()
+          .then(({ data: gmailRow }) => {
+            updateOnboarding(!!gmailRow, rows.length);
+          });
       });
 
     updatePlanUsage(userId);
@@ -2118,6 +2241,45 @@
   }
 
   // Exposer les fonctions appelées depuis le HTML dynamique (innerHTML)
+  // ── Formulaire de contact ─────────────────────────────────────────────
+  function openContactModal() {
+    document.getElementById('contact-modal-overlay').style.display = 'flex';
+    document.getElementById('contact-name').focus();
+  }
+
+  function closeContactModal() {
+    document.getElementById('contact-modal-overlay').style.display = 'none';
+    document.getElementById('contact-name').value = '';
+    document.getElementById('contact-email').value = '';
+    document.getElementById('contact-company').value = '';
+    document.getElementById('contact-message').value = '';
+    document.getElementById('contact-message-status').style.display = 'none';
+  }
+
+  function submitContact() {
+    const name = document.getElementById('contact-name').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+    const company = document.getElementById('contact-company').value.trim();
+    const message = document.getElementById('contact-message').value.trim();
+    const statusEl = document.getElementById('contact-message-status');
+
+    if (!name || !email || !message) {
+      statusEl.textContent = 'Veuillez remplir votre nom, email et message.';
+      statusEl.style.color = '#e53e3e';
+      statusEl.style.display = 'block';
+      return;
+    }
+
+    const subject = encodeURIComponent(`Contact Neluxora AI — ${name}${company ? ' (' + company + ')' : ''}`);
+    const body = encodeURIComponent(`Nom : ${name}\nEmail : ${email}${company ? '\nEntreprise : ' + company : ''}\n\nMessage :\n${message}`);
+    window.location.href = `mailto:contact@neluxoraai.com?subject=${subject}&body=${body}`;
+
+    statusEl.textContent = 'Votre client mail va s\'ouvrir pour envoyer le message.';
+    statusEl.style.color = '#534AB7';
+    statusEl.style.display = 'block';
+    setTimeout(() => closeContactModal(), 2000);
+  }
+
   // ── Mode sombre ────────────────────────────────────────────────────────
   // ── Statistiques ──────────────────────────────────────────────────────
   let weeklyChart = null;
